@@ -1,0 +1,41 @@
+{
+  "version": 2,
+  "type": "performance",
+  "relationship": "new",
+  "source": {
+    "brief": "",
+    "documents": []
+  },
+  "references": [],
+  "objective": null,
+  "target": null,
+  "scope": {
+    "included": [],
+    "excluded": []
+  },
+  "constraints": [],
+  "acceptance_criteria": [],
+  "assumptions": [],
+  "unknowns": [],
+  "classification": {
+    "rationale": "",
+    "uncertain": false,
+    "alternatives": []
+  },
+  "details": {
+    "problem_statement": null,
+    "workload": {
+      "operation": null,
+      "data_shape": null,
+      "load": null
+    },
+    "measurement": {
+      "baseline": null,
+      "target": null,
+      "environment": null,
+      "method": null
+    },
+    "correctness_invariants": [],
+    "trade_off_constraints": []
+  }
+}

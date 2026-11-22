@@ -1,0 +1,1 @@
+../../author-spec/scripts/document.mjs

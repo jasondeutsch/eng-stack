@@ -1,0 +1,49 @@
+{
+  "version": 2,
+  "type": "bug-fix",
+  "relationship": "new",
+  "source": {
+    "brief": "",
+    "documents": []
+  },
+  "references": [],
+  "objective": null,
+  "target": null,
+  "scope": {
+    "included": [],
+    "excluded": []
+  },
+  "constraints": [],
+  "acceptance_criteria": [],
+  "assumptions": [],
+  "unknowns": [],
+  "classification": {
+    "rationale": "",
+    "uncertain": false,
+    "alternatives": []
+  },
+  "details": {
+    "issue": {
+      "description": null,
+      "actual_behavior": null,
+      "expected_behavior": null,
+      "impact": null
+    },
+    "reproduction": {
+      "environment": null,
+      "preconditions": [],
+      "steps": [],
+      "frequency": null
+    },
+    "evidence": [],
+    "regression": {
+      "last_known_good": null,
+      "first_known_bad": null
+    },
+    "known_workarounds": [],
+    "verification": {
+      "correction": null,
+      "regression_coverage": []
+    }
+  }
+}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Document title] — Specification</title>
+<style>
+:root {
+  color-scheme: light;
+  --ink: #182b3d;
+  --muted: #526477;
+  --accent: #146a73;
+  --line: #d8e1e8;
+  --surface: #f2f6f8;
+  font: 14px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: #fff;
+}
+* { box-sizing: border-box; }
+body { max-width: 1240px; margin: 0 auto; padding: 36px 32px; }
+a { color: #075c7b; text-underline-offset: 3px; }
+a:focus-visible, [tabindex]:focus-visible { outline: 3px solid #167c8c; outline-offset: 3px; }
+.skip-link { position: absolute; top: -100px; padding: 8px; background: white; }
+.skip-link:focus { top: 8px; }
+.document-header { border-top: 4px solid var(--accent); padding: 22px 0 24px; }
+.eyebrow, .nav-heading { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+h1 { font-size: clamp(24px, 3vw, 36px); line-height: 1.2; letter-spacing: -.035em; margin: 10px 0 24px; }
+.metadata { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; margin: 0; }
+.metadata div { min-width: 0; }
+dt { color: var(--muted); font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em; }
+dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+.badge { display: inline-block; color: #155963; background: #eaf3f4; border: 1px solid #c8dedf; padding: 1px 7px; font-size: 12px; font-weight: 650; }
+.document-layout { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 32px; border-top: 1px solid var(--line); padding-top: 24px; }
+nav { align-self: start; position: sticky; top: 20px; }
+nav a { display: block; padding: 7px 0; text-decoration: none; color: var(--muted); font-size: 12px; }
+nav a:hover { color: var(--accent); text-decoration: underline; }
+.nav-heading { margin-bottom: 12px; }
+main { min-width: 0; }
+section { margin: 0 0 34px; scroll-margin-top: 20px; }
+h2 { font-size: 18px; font-weight: 650; margin: 0 0 14px; padding-bottom: 9px; border-bottom: 1px solid var(--line); }
+h2 .section-number { color: var(--accent); font-size: 12px; margin-right: 10px; font-variant-numeric: tabular-nums; }
+h3 { font-size: 14px; margin: 18px 0 8px; }
+p { margin: 8px 0 12px; max-width: 85ch; }
+.lead { font-size: 16px; font-weight: 550; margin: 0 0 16px; }
+.note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; line-height: 1.5; margin: 12px 0; }
+caption { text-align: left; font-size: 11px; font-weight: 650; color: var(--muted); margin-bottom: 7px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 11px; border: 1px solid var(--line); overflow-wrap: anywhere; }
+th { overflow-wrap: normal; background: var(--surface); font-size: 11px; color: #354b60; font-weight: 700; }
+.id { white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr:nth-child(even) td { background: #fafcfd; }
+code, pre { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .9em; }
+code { overflow-wrap: anywhere; }
+pre { padding: 14px; background: var(--surface); border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+figure { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); padding: 16px; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
+ul, ol { padding-left: 20px; }
+.document-footer { margin: 32px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+@media (max-width: 800px) {
+  body { padding: 20px 16px; }
+  .metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .document-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  nav { position: static; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  nav a { display: inline-block; margin-right: 14px; }
+  table { font-size: 12px; min-width: 560px; }
+  figure svg { min-width: 600px; }
+  th, td { padding: 8px; }
+}
+@media print {
+  body { max-width: none; padding: 0; font-size: 10pt; }
+  nav, .skip-link { display: none; }
+  .document-layout { display: block; }
+  .metadata { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .table-wrap { overflow: visible; break-inside: avoid; }
+  h2, h3, caption { break-after: avoid; }
+  tr, figure, .metadata div { break-inside: avoid; }
+  thead { display: table-header-group; }
+  a { color: inherit; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to document</a>
+<header class="document-header">
+  <div class="eyebrow">SOFTWARE ENGINEERING / Specification</div>
+  <h1>[Document title]</h1>
+  <dl class="metadata">
+    <div><dt>Reference</dt><dd>[Assignment reference]</dd></div>
+    <div><dt>Revision</dt><dd>[Document revision]</dd></div>
+    <div><dt>Document state</dt><dd><span class="badge">Draft</span></dd></div>
+    <div><dt>Source</dt><dd>[Brief / source reference]</dd></div>
+    <div><dt>Companion revision</dt><dd>[Companion revision]</dd></div>
+    <div><dt>Related document</dt><dd><a href="plan.html">plan.html</a></dd></div>
+  </dl>
+</header>
+<div class="document-layout">
+<nav aria-label="Document sections">
+  <div class="nav-heading">CONTENTS</div>
+  <a href="#scope">Objective and scope</a>
+  <a href="#behavior">Behavior</a>
+  <a href="#contracts">External contracts</a>
+  <a href="#constraints">Constraints and invariants</a>
+  <a href="#acceptance">Acceptance criteria</a>
+  <a href="#decisions">Assumptions and open decisions</a>
+</nav>
+<main id="content">
+<section id="scope">
+<h2><span class="section-number">01</span>Objective and scope</h2>
+<p class="lead">[Define the requested outcome in one precise sentence.]</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Scope boundaries</caption><thead><tr><th scope="col">Included</th><th scope="col">Excluded</th></tr></thead><tbody><tr><td>[Required behavior]</td><td>[Explicit non-goals]</td></tr></tbody></table></div>
+</section>
+<section id="behavior">
+<h2><span class="section-number">02</span>Behavior</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Representative behavior, including material errors and boundaries</caption><thead><tr><th scope="col">Scenario</th><th scope="col">Input / condition</th><th scope="col">Expected result</th></tr></thead><tbody><tr><td>[Scenario]</td><td>[Concrete input]</td><td>[Observable outcome]</td></tr></tbody></table></div>
+</section>
+<section id="contracts">
+<h2><span class="section-number">03</span>External contracts</h2>
+<p>[Include API, event, data, or compatibility contracts only when relevant. Remove this section otherwise. Add an embedded SVG or state table where it explains behavior more clearly.]</p>
+</section>
+<section id="constraints">
+<h2><span class="section-number">04</span>Constraints and invariants</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Applicable project rules and their sources</caption><thead><tr><th scope="col">ID</th><th scope="col">Source / version</th><th scope="col">Binding rule</th><th scope="col">Verification</th></tr></thead><tbody><tr><td class="id">C-001</td><td>[Actual source; version or unknown]</td><td>[Concrete rule]</td><td>[Check or review]</td></tr></tbody></table></div>
+</section>
+<section id="acceptance">
+<h2><span class="section-number">05</span>Acceptance criteria</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Required results, not evidence of execution</caption><thead><tr><th scope="col">ID</th><th scope="col">Observable requirement</th><th scope="col">Representative case</th><th scope="col">Verification method</th></tr></thead><tbody><tr><td class="id">AC-001</td><td>[Required behavior]</td><td>[Input and expected outcome]</td><td>[Test or observation]</td></tr></tbody></table></div>
+</section>
+<section id="decisions">
+<h2><span class="section-number">06</span>Assumptions and open decisions</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Material uncertainty; state none when investigation found none</caption><thead><tr><th scope="col">ID / status</th><th scope="col">Assumption or question</th><th scope="col">Evidence / source</th><th scope="col">Impact / decision needed</th></tr></thead><tbody><tr><td>Q-001 / unresolved</td><td>[Material question]</td><td>[Known facts and missing evidence]</td><td>[Affected behavior and decision owner if known]</td></tr></tbody></table></div>
+</section>
+</main>
+</div>
+<footer class="document-footer">Draft design artifact. Execution evidence and any required decisions are recorded separately by the assignment.</footer>
+</body>
+</html>

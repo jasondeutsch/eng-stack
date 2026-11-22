@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}} — {{TYPE}}</title>
+<style>
+{{STYLES}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to document</a>
+<header class="document-header">
+  <div class="eyebrow">SOFTWARE ENGINEERING / {{TYPE}}</div>
+  <h1>{{TITLE}}</h1>
+  <dl class="metadata">
+    <div><dt>Reference</dt><dd>{{REFERENCE}}</dd></div>
+    <div><dt>Revision</dt><dd>{{REVISION}}</dd></div>
+    <div><dt>Document state</dt><dd><span class="badge">{{STATE}}</span></dd></div>
+    <div><dt>Source</dt><dd>{{SOURCE}}</dd></div>
+    <div><dt>Companion revision</dt><dd>{{COMPANION_REVISION}}</dd></div>
+    <div><dt>Related document</dt><dd><a href="{{COMPANION}}">{{COMPANION}}</a></dd></div>
+  </dl>
+</header>
+<div class="document-layout">
+<nav aria-label="Document sections">
+  <div class="nav-heading">CONTENTS</div>
+{{NAVIGATION}}
+</nav>
+<main id="content">
+{{CONTENT}}
+</main>
+</div>
+<footer class="document-footer">{{FOOTER}}</footer>
+</body>
+</html>

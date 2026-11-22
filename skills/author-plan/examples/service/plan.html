@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Idempotent job submission — Implementation plan</title>
+<style>
+:root {
+  color-scheme: light;
+  --ink: #182b3d;
+  --muted: #526477;
+  --accent: #146a73;
+  --line: #d8e1e8;
+  --surface: #f2f6f8;
+  font: 14px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: #fff;
+}
+* { box-sizing: border-box; }
+body { max-width: 1240px; margin: 0 auto; padding: 36px 32px; }
+a { color: #075c7b; text-underline-offset: 3px; }
+a:focus-visible, [tabindex]:focus-visible { outline: 3px solid #167c8c; outline-offset: 3px; }
+.skip-link { position: absolute; top: -100px; padding: 8px; background: white; }
+.skip-link:focus { top: 8px; }
+.document-header { border-top: 4px solid var(--accent); padding: 22px 0 24px; }
+.eyebrow, .nav-heading { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+h1 { font-size: clamp(24px, 3vw, 36px); line-height: 1.2; letter-spacing: -.035em; margin: 10px 0 24px; }
+.metadata { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; margin: 0; }
+.metadata div { min-width: 0; }
+dt { color: var(--muted); font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em; }
+dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+.badge { display: inline-block; color: #155963; background: #eaf3f4; border: 1px solid #c8dedf; padding: 1px 7px; font-size: 12px; font-weight: 650; }
+.document-layout { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 32px; border-top: 1px solid var(--line); padding-top: 24px; }
+nav { align-self: start; position: sticky; top: 20px; }
+nav a { display: block; padding: 7px 0; text-decoration: none; color: var(--muted); font-size: 12px; }
+nav a:hover { color: var(--accent); text-decoration: underline; }
+.nav-heading { margin-bottom: 12px; }
+main { min-width: 0; }
+section { margin: 0 0 34px; scroll-margin-top: 20px; }
+h2 { font-size: 18px; font-weight: 650; margin: 0 0 14px; padding-bottom: 9px; border-bottom: 1px solid var(--line); }
+h2 .section-number { color: var(--accent); font-size: 12px; margin-right: 10px; font-variant-numeric: tabular-nums; }
+h3 { font-size: 14px; margin: 18px 0 8px; }
+p { margin: 8px 0 12px; max-width: 85ch; }
+.lead { font-size: 16px; font-weight: 550; margin: 0 0 16px; }
+.note { border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; line-height: 1.5; margin: 12px 0; }
+caption { text-align: left; font-size: 11px; font-weight: 650; color: var(--muted); margin-bottom: 7px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 11px; border: 1px solid var(--line); overflow-wrap: anywhere; }
+th { overflow-wrap: normal; background: var(--surface); font-size: 11px; color: #354b60; font-weight: 700; }
+.id { white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr:nth-child(even) td { background: #fafcfd; }
+code, pre { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: .9em; }
+code { overflow-wrap: anywhere; }
+pre { padding: 14px; background: var(--surface); border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+figure { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); padding: 16px; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 12px; color: var(--muted); margin-top: 10px; }
+ul, ol { padding-left: 20px; }
+.document-footer { margin: 32px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+@media (max-width: 800px) {
+  body { padding: 20px 16px; }
+  .metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .document-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  nav { position: static; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  nav a { display: inline-block; margin-right: 14px; }
+  table { font-size: 12px; min-width: 560px; }
+  figure svg { min-width: 600px; }
+  th, td { padding: 8px; }
+}
+@media print {
+  body { max-width: none; padding: 0; font-size: 10pt; }
+  nav, .skip-link { display: none; }
+  .document-layout { display: block; }
+  .metadata { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .table-wrap { overflow: visible; break-inside: avoid; }
+  h2, h3, caption { break-after: avoid; }
+  tr, figure, .metadata div { break-inside: avoid; }
+  thead { display: table-header-group; }
+  a { color: inherit; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to document</a>
+<header class="document-header">
+  <div class="eyebrow">SOFTWARE ENGINEERING / Implementation plan</div>
+  <h1>Idempotent job submission</h1>
+  <dl class="metadata">
+    <div><dt>Reference</dt><dd>EXAMPLE-02</dd></div>
+    <div><dt>Revision</dt><dd>1</dd></div>
+    <div><dt>Document state</dt><dd><span class="badge">Illustrative</span></dd></div>
+    <div><dt>Source</dt><dd>Fictional service brief and project rules</dd></div>
+    <div><dt>Companion revision</dt><dd>1</dd></div>
+    <div><dt>Related document</dt><dd><a href="../../../author-spec/examples/service/spec.html">../../../author-spec/examples/service/spec.html</a></dd></div>
+  </dl>
+</header>
+<div class="document-layout">
+<nav aria-label="Document sections">
+  <div class="nav-heading">CONTENTS</div>
+  <a href="#overview">Proposed change</a>
+  <a href="#design">Design decisions and constraints</a>
+  <a href="#work">Work items</a>
+  <a href="#interfaces">Interface and transaction contract</a>
+  <a href="#verification">Verification</a>
+  <a href="#risks">Risks and unresolved decisions</a>
+</nav>
+<main id="content">
+<section id="overview"><h2><span class="section-number">01</span>Proposed change</h2>
+<p class="lead">Add one transactional submission boundary and persist the response alongside the job.</p>
+<figure tabindex="0">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 210" role="img" aria-labelledby="flow-title flow-desc">
+<title id="flow-title">Submission path and transaction ownership</title>
+<desc id="flow-desc">An authenticated HTTP handler calls a submission service. Its store commits one job and replay record in PostgreSQL. The existing worker polls committed jobs. Replays return the saved response through the service.</desc>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#146a73"/></marker></defs>
+<g fill="#f2f6f8" stroke="#b6cbd1"><rect x="10" y="38" width="170" height="72" rx="4"/><rect x="240" y="38" width="180" height="72" rx="4"/><rect x="480" y="22" width="185" height="112" rx="4"/><rect x="480" y="162" width="185" height="38" rx="4"/></g>
+<g font-family="system-ui, sans-serif" font-size="15" fill="#182b3d" text-anchor="middle"><text x="95" y="69">HTTP handler</text><text x="95" y="91" font-size="12">validate + authenticate</text><text x="330" y="69">Submission service</text><text x="330" y="91" font-size="12">new / replay / conflict</text><text x="572" y="55">PostgreSQL store</text><text x="572" y="79" font-size="12">one transaction</text><text x="572" y="102" font-size="12">job + replay response</text><text x="572" y="186">Existing polling worker</text></g>
+<g stroke="#146a73" stroke-width="2" fill="none" marker-end="url(#arrow)"><path d="M180 74H238"/><path d="M420 74H478"/><path d="M572 134V160"/></g>
+<text x="692" y="72" font-family="system-ui, sans-serif" font-size="12" fill="#526477">COMMIT</text>
+</svg>
+<figcaption>Proposed architecture. The worker observes committed jobs; there is no external dispatch between job creation and replay-record persistence.</figcaption>
+</figure></section>
+<section id="design"><h2><span class="section-number">02</span>Design decisions and constraints</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Proposed decisions</caption><thead><tr><th scope="col">ID</th><th scope="col">Decision</th><th scope="col">Rationale / alternative</th><th scope="col">Consequence</th></tr></thead><tbody>
+<tr><td class="id">D-001</td><td>Unique <code>(tenant_id, key)</code> record; create job and response in the same transaction.</td><td>An in-memory mutex or separate cache cannot resolve retries after restart.</td><td>Database uniqueness coordinates simultaneous requests across replicas.</td></tr>
+<tr><td class="id">D-002</td><td>Persist the response status, content type, and body bytes.</td><td>Reconstructing responses later can change output as the job progresses.</td><td>Storage increases; replay remains stable.</td></tr>
+</tbody></table></div>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Application of spec constraints</caption><thead><tr><th scope="col">Constraint</th><th scope="col">Implementation effect</th><th scope="col">Verification</th></tr></thead><tbody><tr><td class="id">C-001</td><td>HTTP maps service results to responses; storage owns SQL and transactions.</td><td>Import and interface review.</td></tr><tr><td class="id">C-002</td><td>Reuse existing database and worker; no new service deployment.</td><td>Dependency/configuration review.</td></tr><tr><td class="id">C-003</td><td>Use authenticated tenant context and omit keys/payloads from logs.</td><td>Cross-tenant tests and log-path review.</td></tr></tbody></table></div></section>
+<section id="work"><h2><span class="section-number">03</span>Work items</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Fictional project paths; proposed work, not completed work</caption><thead><tr><th scope="col">ID</th><th scope="col">Change / affected paths</th><th scope="col">Depends on</th><th scope="col">Coverage</th></tr></thead><tbody>
+<tr><td class="id">P-001</td><td>Add the replay schema and transactional store operation under <code>internal/jobs/postgres</code>; test uniqueness and rollback against PostgreSQL.</td><td>None</td><td>AC-001–005, C-002</td></tr>
+<tr><td class="id">P-002</td><td>Add the submission service and handler mapping under <code>internal/jobs</code> and <code>internal/httpapi</code>; preserve validation and authorization.</td><td class="id">P-001</td><td>AC-001–005, C-001, C-003</td></tr>
+<tr><td class="id">P-003</td><td>Add restart, lost-response, and concurrent-handler cases under <code>tests/integration/jobs</code>.</td><td class="id">P-002</td><td>AC-002–006</td></tr>
+</tbody></table></div></section>
+<section id="interfaces"><h2><span class="section-number">04</span>Interface and transaction contract</h2>
+<pre><code>Submit(ctx, authenticatedTenant, key, validatedBody)
+  → {status, contentType, responseBody} | validation/conflict/storage error
+
+BEGIN
+  INSERT replay slot (tenant, key, body_digest) ON CONFLICT DO NOTHING
+  if inserted:
+    INSERT job
+    UPDATE replay slot with job_id + exact response
+  else:
+    SELECT committed replay slot in a new READ COMMITTED statement
+    compare digest → replay or conflict
+COMMIT</code></pre>
+<p>The replay slot and job are invisible until commit. A conflicting insert waits for the first transaction to commit or roll back. If it rolls back, the other insert may succeed. Bound waits with the request context and database timeouts.</p></section>
+<section id="verification"><h2><span class="section-number">05</span>Verification</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Expected evidence only; no checks are claimed to have run</caption><thead><tr><th scope="col">Coverage</th><th scope="col">Check</th><th scope="col">Expected evidence</th><th scope="col">Prerequisites</th></tr></thead><tbody>
+<tr><td>AC-001–005</td><td>Store and handler tests, including concurrent independent connections.</td><td>One durable job for equal requests; mismatch rejected; no partial records.</td><td>Configured Go toolchain; isolated PostgreSQL test database.</td></tr>
+<tr><td class="id">AC-006</td><td>Restart/lost-response integration cases.</td><td>Same committed response after reconnect/restart; no additional job.</td><td>Restartable test service and durable test database.</td></tr>
+<tr><td>C-001–003</td><td>Review imports, SQL ownership, configuration, and logs; run project lint checks.</td><td>No transport-owned SQL, added service, or logged key/payload.</td><td>Actual repository rules and installed project tools.</td></tr>
+</tbody></table></div></section>
+<section id="risks"><h2><span class="section-number">06</span>Risks and unresolved decisions</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Material failure conditions</caption><thead><tr><th scope="col">Condition</th><th scope="col">Impact</th><th scope="col">Mitigation / recovery</th></tr></thead><tbody><tr><td>Unknown commit outcome</td><td>Caller cannot know whether submission succeeded.</td><td>503 and retry using the same key; durable record resolves ambiguity.</td></tr><tr><td>Long transaction / contended key</td><td>Concurrent callers may wait.</td><td>Bound transaction time; do not perform external work before commit.</td></tr><tr><td>Application rollback</td><td>Removing replay handling would break retry guarantees.</td><td>Keep the schema additive and restore a compatible replay-capable build; do not drop durable records as rollback.</td></tr></tbody></table></div>
+<p>No unresolved choices within the fictional brief. Retention and job deletion semantics require a separate design if introduced later.</p></section>
+</main>
+</div>
+<footer class="document-footer">Illustrative design fixture. Requirements and project rules are fictional. No implementation, verification run, or approval is claimed.</footer>
+</body>
+</html>

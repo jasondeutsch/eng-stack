@@ -1,0 +1,34 @@
+<section id="scope"><h2><span class="section-number">01</span>Objective and scope</h2>
+<p class="lead">Retrying a job-submission request must not create a second job for the same tenant and request key.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Scope</caption><thead><tr><th scope="col">Included</th><th scope="col">Excluded</th></tr></thead><tbody><tr><td>Tenant-scoped idempotency for authenticated <code>POST /jobs</code>; conflict detection; replay of the committed response.</td><td>New queue services, job execution changes, automatic key expiration, and cross-tenant deduplication.</td></tr></tbody></table></div></section>
+<section id="behavior"><h2><span class="section-number">02</span>Behavior and external contract</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Submission protocol</caption><thead><tr><th scope="col">Condition</th><th scope="col">Result</th><th scope="col">Durable effect</th></tr></thead><tbody>
+<tr><td>Valid new key and valid request</td><td><code>201</code> with the job response.</td><td>One job and one replay record, committed together.</td></tr>
+<tr><td>Same tenant, key, and exact request bytes</td><td>Replay the original status, content type, and response body.</td><td>No second job.</td></tr>
+<tr><td>Same tenant and key; different request bytes</td><td><code>409</code>; no job details from other tenants.</td><td>No additional job.</td></tr>
+<tr><td>Missing key or key outside 1–128 printable ASCII characters</td><td><code>400</code>.</td><td>No writes.</td></tr>
+<tr><td>Database unavailable or commit outcome uncertain</td><td><code>503</code>; retry with the same key.</td><td>A later replay resolves a previously committed request.</td></tr>
+</tbody></table></div>
+<pre><code>POST /jobs
+Idempotency-Key: client-generated-key
+Content-Type: application/json
+
+{"type":"report","period":"2026-10"}</code></pre>
+<p>Request equivalence is byte-for-byte equality of the validated JSON request body, represented by SHA-256. Semantically equivalent JSON with different bytes is a conflict. Authentication and existing payload validation still run before submission.</p></section>
+<section id="constraints"><h2><span class="section-number">03</span>Constraints and invariants</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Fictional project rules included explicitly for this example</caption><thead><tr><th scope="col">ID</th><th scope="col">Source / version</th><th scope="col">Binding rule</th><th scope="col">Verification</th></tr></thead><tbody>
+<tr><td class="id">C-001</td><td>Example architecture rule, revision 1</td><td>Transport depends on the submission service; transaction and storage details remain outside HTTP handlers.</td><td>Package dependency and interface review.</td></tr>
+<tr><td class="id">C-002</td><td>Example infrastructure constraint, revision 1</td><td>Use the existing PostgreSQL database and polling worker. Add no external queue or cache.</td><td>Configuration and dependency review.</td></tr>
+<tr><td class="id">C-003</td><td>Example security rule, revision 1</td><td>Tenant identity comes from authenticated context, never from a request-supplied tenant field. Keys and payloads are not logged.</td><td>Cross-tenant cases and log-path review.</td></tr>
+</tbody></table></div></section>
+<section id="acceptance"><h2><span class="section-number">04</span>Acceptance criteria</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Observable requirements and proposed verification</caption><thead><tr><th scope="col">ID</th><th scope="col">Requirement</th><th scope="col">Representative verification</th></tr></thead><tbody>
+<tr><td class="id">AC-001</td><td>One valid new request creates one job and returns its committed response.</td><td>Handler/service integration case and row-count assertions.</td></tr>
+<tr><td class="id">AC-002</td><td>Sequential and concurrent equal requests produce one job and the same response.</td><td>Concurrent requests against real PostgreSQL, with separate connections.</td></tr>
+<tr><td class="id">AC-003</td><td>Different payload bytes for the same tenant/key return 409 without another job.</td><td>Payload mismatch and concurrency cases.</td></tr>
+<tr><td class="id">AC-004</td><td>The same key in different tenants is independent; unauthorized requests cannot observe replay records.</td><td>Two authenticated tenants and a rejected caller.</td></tr>
+<tr><td class="id">AC-005</td><td>Invalid input and rolled-back transactions leave no partial job/replay pair.</td><td>Validation cases and transactional failure injection.</td></tr>
+<tr><td class="id">AC-006</td><td>A retry after response loss or service restart replays the durable response.</td><td>Discard the first HTTP response, restart the service, then retry the same request.</td></tr>
+</tbody></table></div></section>
+<section id="uncertainty"><h2><span class="section-number">05</span>Assumptions and open decisions</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Explicit example assumptions</caption><thead><tr><th scope="col">Status</th><th scope="col">Assumption / decision</th><th scope="col">Impact</th></tr></thead><tbody><tr><td>Given by fictional brief</td><td>The existing worker discovers committed jobs by polling PostgreSQL.</td><td>No external dispatch must occur inside the transaction.</td></tr><tr><td>Given by fictional brief</td><td>No automatic replay-record expiration is required for this change.</td><td>A future retention policy must define when reuse of a key becomes safe.</td></tr></tbody></table></div></section>

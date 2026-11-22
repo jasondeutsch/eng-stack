@@ -1,0 +1,18 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Menlo, Consolas, monospace","fontSize":"18px","primaryTextColor":"#dbe7f3","lineColor":"#596f84","edgeLabelBackground":"#0d1117","background":"#0d1117"},"flowchart":{"curve":"linear","nodeSpacing":25,"rankSpacing":38,"padding":21,"htmlLabels":true}}}%%
+flowchart TB
+    INTAKE["01 / INTAKE<br/><br/>Prompt → typed task<br/>Five task templates"]
+    READY["02 / READINESS<br/><br/>Actionable objective?<br/>Admit or escalate"]
+    DESIGN["03 / DESIGN<br/><br/>Spec + plan ⇄ review<br/>Human approval"]
+    BUILD["04 / BUILD<br/><br/>Code ⇄ review<br/>Human acceptance"]
+    REPORT["READ / INVESTIGATE<br/><br/>Evidence report<br/>Human acceptance"]
+    DONE["05 / ACCEPTED<br/><br/>Result + evidence<br/>Recorded decision"]
+    INTAKE --> READY
+    READY -->|change task| DESIGN
+    DESIGN -->|approved design| BUILD
+    READY -->|investigation| REPORT
+    REPORT -->|accepted| DONE
+    BUILD -->|accepted| DONE
+    classDef normal fill:#161f2a,stroke:#354a5e,color:#dbe7f3,stroke-width:1px;
+    classDef finish fill:#12322d,stroke:#387f6b,color:#a8f0d5,stroke-width:1px;
+    class INTAKE,READY,DESIGN,BUILD,REPORT normal;
+    class DONE finish;

@@ -1,0 +1,13 @@
+{
+  "name": "pragma-ai-eng",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@pragma/controls-sdk": "file:../controls/sdk/typescript",
+    "@pragma/adapter-pi": "file:../controls/adapters/pi"
+  },
+  "registrySource": {
+    "repository": "https://github.com/PragmaEngineering/factory-registry",
+    "revision": "e2b78cd3017779b84e87315e90d48b03f47b9c50"
+  }
+}

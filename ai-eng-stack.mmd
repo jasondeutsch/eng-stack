@@ -1,0 +1,80 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Arial, Helvetica, sans-serif","fontSize":"16px","primaryTextColor":"#173047","lineColor":"#708397","edgeLabelBackground":"#ffffff","clusterBkg":"#f7f9fc","clusterBorder":"#d5dee8"},"flowchart":{"curve":"basis","nodeSpacing":25,"rankSpacing":34,"padding":14,"htmlLabels":true}}}%%
+%% Loop exhaustion escalates open findings to the human gate.
+%% Human requests for changes start a fresh bounded series.
+%% Failed steps block execution. Investigations follow a read-only report route.
+flowchart TB
+    subgraph WORKFLOW["ENGINEERING WORKFLOW"]
+        direction LR
+        subgraph INTAKE["1 · INTAKE AND ADMISSION"]
+            direction TB
+            REQUEST(["Request from a user or system"])
+            FORM["Task-intake skill<br/>Select type and fill its template"]
+            TEMPLATES["Five task templates<br/>Bug fix · Feature · Refactor<br/>Performance · Investigation"]
+            TASK["Typed task<br/>Objective, scope, acceptance criteria,<br/>original request and unknowns"]
+            READY{"Readiness classifier"}
+            ADMISSION{"Human admission"}
+            ADMITTED(["Admitted task"])
+            STOP_INTAKE["Blocked"]
+            REQUEST --> FORM --> TASK --> READY
+            TEMPLATES -.-> FORM
+            READY -->|Admit| ADMITTED
+            READY -->|Review required| ADMISSION
+            ADMISSION -->|Approve with reason| ADMITTED
+            ADMISSION -->|Reject| STOP_INTAKE
+        end
+        subgraph DESIGN["2 · DESIGN · 3 REVIEW ROUNDS"]
+            direction TB
+            SPEC["Specification and plan<br/>Behavior, constraints and checks"]
+            ARCH["Independent architecture review<br/>Findings tied to document revisions"]
+            DESIGN_GATE{"Human design approval"}
+            APPROVED(["Approved design"])
+            STOP_DESIGN["Blocked"]
+            SPEC --> ARCH
+            ARCH -->|Revise| SPEC
+            ARCH -->|Satisfactory or limit reached| DESIGN_GATE
+            DESIGN_GATE -->|Request changes| SPEC
+            DESIGN_GATE -->|Approve| APPROVED
+            DESIGN_GATE -->|Reject| STOP_DESIGN
+        end
+        subgraph DELIVERY["3 · IMPLEMENTATION · 3 REVIEW ROUNDS"]
+            direction TB
+            BUILD["Implement approved plan<br/>Source changes and check evidence"]
+            CODE["Independent code review<br/>Acceptance coverage and finding resolutions"]
+            ACCEPT{"Human acceptance"}
+            DONE(["Accepted result"])
+            STOP_BUILD["Blocked"]
+            BUILD --> CODE
+            CODE -->|Repair| BUILD
+            CODE -->|Satisfactory or limit reached| ACCEPT
+            ACCEPT -->|Request changes| BUILD
+            ACCEPT -->|Accept| DONE
+            ACCEPT -->|Reject| STOP_BUILD
+        end
+        INTAKE -->|Admitted change task| DESIGN
+        ADMITTED -->|Investigation| REPORT["Read-only investigation<br/>Answer, evidence and limitations"]
+        REPORT --> REPORT_GATE{"Human report acceptance"}
+        REPORT_GATE -->|Request changes| REPORT
+        REPORT_GATE -->|Accept| DONE
+        REPORT_GATE -->|Reject| STOP_INTAKE
+        DESIGN -->|Approved design| DELIVERY
+    end
+    subgraph FOUNDATION["ACROSS THE WORKFLOW"]
+        direction LR
+        CONFIG["Configuration<br/>Language, models, agent packages,<br/>tools, checks and task-type routes"]
+        CONTROL["Execution control<br/>Agents propose · Policies validate<br/>Engine owns state, routing and limits"]
+        EVIDENCE["Workspace and evidence<br/>Isolated worktree; approved-stage commits<br/>Retained artifacts, findings and usage"]
+        METRICS["Proposed evaluation<br/>Accepted completion · Escaped defects<br/>First-review pass · Rework · Cycle time<br/>Cost per accepted task · Human effort"]
+        CONFIG ~~~ CONTROL ~~~ EVIDENCE ~~~ METRICS
+    end
+    WORKFLOW ~~~ FOUNDATION
+    classDef step fill:#edf5fb,stroke:#9abbd2,color:#173047,stroke-width:1px;
+    classDef proposed fill:#fff3db,stroke:#c89439,color:#654912,stroke-width:1.5px,stroke-dasharray:5 3;
+    classDef human fill:#f0edfa,stroke:#aa9ac8,color:#463563,stroke-width:1px;
+    classDef success fill:#e6f4ec,stroke:#82b49a,color:#214b37,stroke-width:1.5px;
+    classDef blocked fill:#fbeeee,stroke:#c69b9b,color:#733f3f,stroke-width:1px;
+    classDef support fill:#ffffff,stroke:#d2dce6,color:#40556b,stroke-width:1px;
+    class REQUEST,TASK,READY,SPEC,ARCH,BUILD,CODE,FORM,TEMPLATES,REPORT step;
+    class ADMISSION,DESIGN_GATE,ACCEPT,REPORT_GATE human;
+    class ADMITTED,APPROVED,DONE success;
+    class STOP_INTAKE,STOP_DESIGN,STOP_BUILD blocked;
+    class CONFIG,CONTROL,EVIDENCE,METRICS support;

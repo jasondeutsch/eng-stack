@@ -1,0 +1,12 @@
+<section id="overview"><h2><span class="section-number">01</span>Change</h2>
+<p class="lead">Normalize ASCII case at the existing parser boundary; keep validation and formatting unchanged.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Work items; paths refer to the fictional example project</caption><thead><tr><th scope="col">ID</th><th scope="col">Change</th><th scope="col">Depends on</th><th scope="col">Coverage</th></tr></thead><tbody>
+<tr><td class="id">P-001</td><td>Update the status parser in <code>internal/cli/filter.go</code> and its table-driven cases in <code>filter_test.go</code>. Accept case variants only for already supported values.</td><td>None</td><td>AC-001, AC-002</td></tr>
+<tr><td class="id">P-002</td><td>Extend <code>status_command_test.go</code> to compare canonical and mixed-case command output, and preserve invalid-input exit behavior.</td><td class="id">P-001</td><td>AC-001, AC-002, C-001</td></tr>
+</tbody></table></div></section>
+<section id="verification"><h2><span class="section-number">02</span>Verification</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable technical table"><table><caption>Planned checks; not executed results</caption><thead><tr><th scope="col">Coverage</th><th scope="col">Check</th><th scope="col">Expected evidence</th><th scope="col">Prerequisite</th></tr></thead><tbody>
+<tr><td>AC-001, AC-002</td><td><code>go test ./internal/cli</code></td><td>Case variants match; invalid values and whitespace retain their errors.</td><td>Example project's configured Go toolchain.</td></tr>
+<tr><td class="id">C-001</td><td>Compare command output/exit assertions and dependency configuration.</td><td>Output and dependencies remain unchanged.</td><td>Pre-change assertions and dependency baseline.</td></tr>
+</tbody></table></div>
+<p>Progress and actual command results belong in the assignment's result artifact. No deployment, migration, or approval process is introduced by this plan.</p></section>

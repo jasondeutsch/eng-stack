@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gopls": {
+      "command": "gopls",
+      "args": [
+        "mcp"
+      ],
+      "description": "Go source navigation and diagnostics",
+      "exposure": "codemode"
+    }
+  }
+}

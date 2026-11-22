@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "type": "feature",
+  "relationship": "new",
+  "source": {
+    "brief": "",
+    "documents": []
+  },
+  "references": [],
+  "objective": null,
+  "target": null,
+  "scope": {
+    "included": [],
+    "excluded": []
+  },
+  "constraints": [],
+  "acceptance_criteria": [],
+  "assumptions": [],
+  "unknowns": [],
+  "classification": {
+    "rationale": "",
+    "uncertain": false,
+    "alternatives": []
+  },
+  "details": {
+    "problem_statement": null,
+    "users": [],
+    "desired_outcome": null,
+    "usage_scenarios": [],
+    "external_contracts": [],
+    "compatibility": {
+      "behavior_to_retain": [],
+      "migration_constraints": []
+    },
+    "success_measure": null
+  }
+}

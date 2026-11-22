@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "type": "investigation",
+  "relationship": "new",
+  "source": {
+    "brief": "",
+    "documents": []
+  },
+  "references": [],
+  "objective": null,
+  "target": null,
+  "scope": {
+    "included": [],
+    "excluded": []
+  },
+  "constraints": [],
+  "acceptance_criteria": [],
+  "assumptions": [],
+  "unknowns": [],
+  "classification": {
+    "rationale": "",
+    "uncertain": false,
+    "alternatives": []
+  },
+  "details": {
+    "question": null,
+    "context": null,
+    "known_evidence": [],
+    "hypotheses": [],
+    "suggested_approach": null,
+    "deliverable": null,
+    "completion_condition": null,
+    "read_only": true
+  }
+}
