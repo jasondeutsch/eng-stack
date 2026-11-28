@@ -1,0 +1,13 @@
+# Project guidance — AI coding interview
+
+Use only if the interview permits repository instruction files. Replace bracketed fields and merge with existing instructions; do not overwrite them.
+
+- Project and relevant files: [Short orientation]
+- Run/check commands: [Verified commands, working directory, and prerequisites]
+- Workspace and expected branch: supplied by the current assignment; confirm before editing.
+- Read the original question and task.md. Keep Spec, Plan, and Progress concise.
+- Implement only the authorized P-ID; explain important reasoning and stop for feedback.
+- Record actual results and open issues in Progress. Do not invent measurements or completion.
+- Raise material ambiguity and scope changes. Preserve unrelated work; do not install tooling, commit, or submit without direction.
+
+Use the provided environment and permitted assistance. The human explains, reviews, demonstrates, and submits the solution.

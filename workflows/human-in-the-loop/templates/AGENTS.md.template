@@ -1,0 +1,24 @@
+# Project guidance — Human Is the Loop
+
+Replace bracketed fields with verified project facts before installing. Merge with existing guidance; do not overwrite it. This file holds standing instructions, not task state.
+
+## Project
+[Purpose, important source boundaries, and links to existing architecture/contribution guidance.]
+
+## Commands
+- Setup: [Documented setup command and prerequisites]
+- Focused verification: [Command and required working directory]
+- Broader checks: [Relevant build, test, lint, or typecheck commands]
+- Application verification: [Project-local verification skill or procedure, if established]
+
+## Work ownership
+Use the absolute worktree path and branch supplied in the assignment. Check them before editing and after resuming; stop on mismatch. Keep one active writer. Do not switch branches or modify another checkout without direction.
+
+Read the assigned spec.md, plan.md, and progress.md before acting. Use the assigned Markdown format even when a shared skill describes HTML defaults. Preserve recorded approvals and evidence. If the assignment or currently authorized P-ID is missing or inconsistent, ask; do not guess which task is active.
+
+Implement only the authorized P-ID. Report changes, actual verification, open issues, and next action in progress.md, then stop for human feedback. A task list or completed check does not authorize another task. Raise required scope/design changes rather than silently rewriting requirements. Reviewers return findings without repairing source unless assigned that role.
+
+## Skills and tools
+Use the stage skills selected by the assignment under AI_ENG_DIR/skills. Read their instructions; availability alone does not load the method. Keep shared skills read-only during project work. Use project-verification, ci-diagnostics, or performance-measurement when relevant to the assigned work; missing tools do not authorize installation.
+
+Keep credentials out of task records. Preserve unrelated work. Commit, merge, push, and deployment follow the human's explicit assignment; acceptance is a human decision. Prompt instructions are not filesystem enforcement.

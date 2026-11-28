@@ -1,51 +1,61 @@
-# ai-eng
+# Agentic Software Engineering Toolkit
 
-### An engineering process agents can run and people can inspect.
+### Three ways to run an agentic software development lifecycle.
 
 ![Working design · language agnostic · human approval gates](assets/project-status.png)
 
-Turn a request into a typed task, a reviewed design, and an implementation backed by evidence. Configure the language, models, and tools around that process.
+Define the outcome, inspect the design, implement bounded work, and verify the result. Choose who drives the process and how much tooling the setting supports.
 
-**[Install and run](#local-factory)** · **[Read the design](AI%20Software%20Engineering%20Stack.md)** · **[Factory master diagram](ai-eng-stack.svg)** · **[PNG](ai-eng-stack.png)**
+| Scenario | Who drives it | Tools and artifacts | Start here |
+| --- | --- | --- | --- |
+| **Factory** | Workflow engine, policies, and human gates | Factory Controls + Monitor; optional Fabric; configured agents, skills, hooks, and execution artifacts. | [Overview](workflows/factory/README.md) · [Setup](workflows/factory/SETUP.md) |
+| **Human Is the Loop** | You assign work, evaluate evidence, and authorize each transition | Pi, your skills and project tools, Git worktrees; `spec.md`, `plan.md`, `progress.md`. | [Workflow](workflows/human-in-the-loop/README.md) · [Setup](workflows/human-in-the-loop/SETUP.md) |
+| **AI coding interview** | You solve and explain the problem with permitted AI assistance | Pi or Claude in the supplied environment; one lightweight `task.md`. | [Workflow](workflows/interview/README.md) · [Printable cheat sheet](workflows/interview/cheat-sheet.pdf) |
 
-## Factory workflow
-
-![Factory master diagram: every step, stage, route, human decision, artifact and lifecycle hook](ai-eng-stack.svg)
-
-[Open SVG](ai-eng-stack.svg) · [Download PNG](ai-eng-stack.png) · [factory.yaml](factory.yaml)
-
-Intake uses [five task templates](skills/task-intake/SKILL.md): bug fix, feature, refactor, performance, and investigation. Investigations produce a read-only report for human acceptance. The full workflow records rejection, repair, escalation, and human decisions. Each review stage allows up to three rounds before escalation.
-
-## The execution contract
+## Repository layout
 
 ```text
-AGENTS   → investigate · design · build · verify · review
-ENGINE   → permissions · routing · limits · durable state
-PEOPLE   → admission · design approval · acceptance
+workflows/
+  factory/
+    factory.yaml        reference workflow configuration
+    install.sh          Controls + Monitor installer
+    package*.json       Factory SDK / adapter dependencies
+    agents/             worker bundles and per-agent installers
+    classifiers/        task-readiness classifier
+    scripts/            engine lifecycle hooks
+    skills/             Factory hook guidance
+    diagrams/           workflow diagrams
+    README.md           overview, with setup and design alongside
+  human-in-the-loop/    Pi workflow, setup, Markdown templates
+  interview/            interview workflow and printable cheat sheet
+skills/                 shared engineering methods and their bundled tools
+assets/                 shared repository visuals
 ```
 
-Bug fixes demonstrate correction. Refactors demonstrate preservation. Performance changes demonstrate measured improvement. Templates make those obligations explicit.
+Factory-only configuration, dependencies, installation, and runtime resources live in `workflows/factory/`. Shared skills stay at the root and are linked into worker bundles. Agent-invoked scripts belong inside their owning skill; see [Factory script ownership](workflows/factory/scripts/README.md).
 
-## Local factory
+## Shared engineering contract
 
-Requires Git, Go, Node.js, and npm. Install Controls and Monitor from `main`:
-
-```sh
-./install.sh
-export PATH="$HOME/.local/bin:$PATH"
+```text
+INTENT     → agreed behavior and observable acceptance criteria
+DESIGN     → implementation tasks with explicit verification
+EXECUTION  → bounded changes and actual evidence
+ACCEPTANCE → your decision about whether the result satisfies the task
 ```
 
-Use `./install.sh --prefix /path/to/install` to choose another location. Re-running updates clean `main` checkouts and rebuilds both components.
+Bug fixes demonstrate correction. Refactors demonstrate preservation. Performance work demonstrates measured improvement. Investigations produce supported conclusions and limitations. Reuse the [task-type guidance](skills/task-intake/references/task-briefs.md) without requiring every scenario to run a classifier.
 
-Define `factory.yaml` in your project using the [configuration reference](https://github.com/PragmaEngineering/factory-controller/blob/main/docs/factory-yaml.md). Install the selected [agents](agents/README.md) with their `install.macos.sh`, then configure credentials before starting the service. The [workflow in this repository](factory.yaml) is one reference configuration.
+## Shared capabilities
 
-```sh
-factory start
-factory monitor start -d
-factory exec "Your task" -c /path/to/project/factory.yaml
-```
+| Skill | Use |
+| --- | --- |
+| [Project verification](skills/project-verification/SKILL.md) | Establish or run real-interface verification with owned resources and persistent evidence. |
+| [CI diagnostics](skills/ci-diagnostics/SKILL.md) | Inspect GitHub Actions failures and distinguish pending/unavailable checks from success. |
+| [Performance measurement](skills/performance-measurement/SKILL.md) | Compare actual workloads, correctness, completed work, variation, and resource limits. |
+| [Debugging](skills/evidence-based-debugging/SKILL.md) | Reproduce and minimize failures; discriminate causes with evidence. |
+| [Code review](skills/critical-code-review/SKILL.md) | Challenge correctness and indirect-contract safety with concrete scenarios. |
 
-Open the URL printed by Monitor to inspect executions and handle configured decisions. `factory stop --all` stops both services.
+Agent-called scripts stay inside their owning skill. Target-project [manual](workflows/human-in-the-loop/templates/AGENTS.md.template) and [interview](workflows/interview/templates/AGENTS.md.template) instruction templates are opt-in: merge verified project facts into existing guidance rather than copying task state or overwriting instructions. Factory worker roles remain in their bundles.
 
 ## The Pragma toolkit
 
@@ -54,17 +64,6 @@ Open the URL printed by Monitor to inspect executions and handle configured deci
 | Runtime | [factory-controller](https://github.com/PragmaEngineering/factory-controller) | Workflow execution, routing, human decisions, and CLI. |
 | Operator UI | [factory-monitor](https://github.com/PragmaEngineering/factory-monitor) | Execution graphs, messages, findings, and decisions. |
 | Optional delegation | [factory-fabric](https://github.com/PragmaEngineering/factory-fabric) | Capability discovery and asynchronous specialist calls. |
+| Registry | [factory-registry](https://github.com/PragmaEngineering/factory-registry) | Reference configurations, agents, and skills. |
 
-[Reference factory configuration](https://github.com/PragmaEngineering/factory-registry/blob/main/factories/golang/factory.yaml) · [PragmaEngineering](https://github.com/PragmaEngineering)
-
-## The scorecard
-
-**Quality** / Accepted completion · Escaped defects · First-review pass  
-**Effort** / Rework · Human involvement  
-**Efficiency** / Cycle time · Cost per accepted task
-
-[Definitions and accounting rules](AI%20Software%20Engineering%20Stack.md#proposed-execution-metrics)
-
----
-
-**Working design.** This repository includes the base factory configuration, agent bundles, skills, classifier, hooks, and diagrams. Typed intake and templates are included; metric collection is being defined. Next: evaluate a bug fix and a feature through the workflow.
+The manual and interview workflows do not require Factory or Fabric. The Factory scenario documents the existing integration boundaries; Fabric is optional, not a replacement for workflow authority.

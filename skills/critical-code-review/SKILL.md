@@ -10,6 +10,8 @@ Build an independent view from the brief, applicable spec and plan, actual sourc
 
 For a material claim, identify the evidence and try to construct a realistic counterexample. Ask precise questions: which invariant prevents the failure, what happens after partial success, or which assertion demonstrates the required result? Trace existing protections before reporting a defect. The goal is better software, not an argument or a quota of findings.
 
+For changes whose safety depends on indirect behavior, read [change-impact guidance](references/change-impact.md): trace external contracts and verify consequential safety assumptions beyond direct callers. This is additional scrutiny within the assigned review, not authorization to edit source or run an arena.
+
 Use [the review method](references/review-method.md) for investigation, useful challenge questions, evidence grading, and report structure. Resolve links from this skill's source directory. Use the configured language skills for language-specific behavior and verification quality.
 
 Keep the submitted application source and tests unchanged. Report needed repairs and design or scope disagreements through the assigned handoff. Recheck responses against the actual finding and preserve stable IDs across rounds. Stop when material concerns are resolved; do not manufacture more work.
